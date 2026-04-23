@@ -47,10 +47,6 @@ type WebServerSpec struct {
 	// 资源限制
 	// +optional
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
-
-	// 目标部署 namespace（默认为 CR 所在 namespace）
-	// +optional
-	TargetNamespace string `json:"targetNamespace,omitempty"`
 }
 
 // WebServerStatus defines the observed state of WebServer.

@@ -7,20 +7,15 @@ import (
 )
 
 type webServerConfig struct {
-	targetNamespace string
-	replicas        int32
-	image           string
-	port            int32
-	serviceType     corev1.ServiceType
-	labels          map[string]string
+	namespace   string
+	replicas    int32
+	image       string
+	port        int32
+	serviceType corev1.ServiceType
+	labels      map[string]string
 }
 
 func buildWebServerConfig(ws *webv1.WebServer) webServerConfig {
-	targetNamespace := ws.Namespace
-	if ws.Spec.TargetNamespace != "" {
-		targetNamespace = ws.Spec.TargetNamespace
-	}
-
 	replicas := int32(1)
 	if ws.Spec.Replicas != nil {
 		replicas = *ws.Spec.Replicas
@@ -45,11 +40,11 @@ func buildWebServerConfig(ws *webv1.WebServer) webServerConfig {
 	}
 
 	return webServerConfig{
-		targetNamespace: targetNamespace,
-		replicas:        replicas,
-		image:           image,
-		port:            port,
-		serviceType:     serviceType,
+		namespace:   ws.Namespace,
+		replicas:    replicas,
+		image:       image,
+		port:        port,
+		serviceType: serviceType,
 		labels: map[string]string{
 			"app.kubernetes.io/name":     "webserver",
 			"app.kubernetes.io/instance": ws.Name,

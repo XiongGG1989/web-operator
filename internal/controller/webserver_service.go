@@ -17,7 +17,7 @@ func (r *WebServerReconciler) reconcileService(
 	cfg webServerConfig,
 ) (controllerutil.OperationResult, bool, error) {
 	svc := &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{Name: ws.Name, Namespace: cfg.targetNamespace},
+		ObjectMeta: metav1.ObjectMeta{Name: ws.Name, Namespace: cfg.namespace},
 	}
 
 	var changed bool
@@ -37,7 +37,7 @@ func (r *WebServerReconciler) reconcileService(
 			}},
 		}
 
-		return r.setOwnerReferenceIfAllowed(ws, svc)
+		return controllerutil.SetControllerReference(ws, svc, r.Scheme)
 	})
 
 	return result, changed, err
@@ -61,9 +61,9 @@ func (r *WebServerReconciler) logServiceResult(
 	changed bool,
 ) {
 	if result == controllerutil.OperationResultCreated {
-		log.Info("Service created", "namespace", cfg.targetNamespace, "name", ws.Name, "type", cfg.serviceType, "port", cfg.port)
+		log.Info("Service created", "namespace", cfg.namespace, "name", ws.Name, "type", cfg.serviceType, "port", cfg.port)
 	}
 	if result == controllerutil.OperationResultUpdated && changed {
-		log.Info("Service updated", "namespace", cfg.targetNamespace, "name", ws.Name)
+		log.Info("Service updated", "namespace", cfg.namespace, "name", ws.Name)
 	}
 }

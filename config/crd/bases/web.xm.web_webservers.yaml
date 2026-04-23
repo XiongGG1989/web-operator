@@ -119,9 +119,6 @@ spec:
                 - NodePort
                 - LoadBalancer
                 type: string
-              targetNamespace:
-                description: 目标部署 namespace（默认为 CR 所在 namespace）
-                type: string
             type: object
           status:
             description: status defines the observed state of WebServer

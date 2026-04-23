@@ -20,7 +20,7 @@ func (r *WebServerReconciler) reconcileStatus(
 	cfg webServerConfig,
 ) error {
 	currentDeploy := &appsv1.Deployment{}
-	if err := r.Get(ctx, types.NamespacedName{Name: ws.Name, Namespace: cfg.targetNamespace}, currentDeploy); err != nil {
+	if err := r.Get(ctx, types.NamespacedName{Name: ws.Name, Namespace: cfg.namespace}, currentDeploy); err != nil {
 		setCondition(&ws.Status, metav1.Condition{
 			Type:    "Degraded",
 			Status:  metav1.ConditionTrue,
@@ -31,7 +31,7 @@ func (r *WebServerReconciler) reconcileStatus(
 		if currentDeploy.Status.AvailableReplicas != ws.Status.AvailableReplicas {
 			log.Info(
 				"Pod replicas changed",
-				"namespace", cfg.targetNamespace,
+				"namespace", cfg.namespace,
 				"name", ws.Name,
 				"available", currentDeploy.Status.AvailableReplicas,
 				"desired", *currentDeploy.Spec.Replicas,
@@ -44,8 +44,6 @@ func (r *WebServerReconciler) reconcileStatus(
 		setCondition(&ws.Status, availabilityCondition(currentDeploy))
 		setCondition(&ws.Status, progressingCondition(currentDeploy))
 	}
-
-	setCrossNamespaceOwnerReferenceCondition(&ws.Status, ws, cfg)
 
 	return r.Status().Update(ctx, ws)
 }
@@ -70,17 +68,6 @@ func progressingCondition(deploy *appsv1.Deployment) metav1.Condition {
 		Reason:  map[bool]string{true: "Updating", false: "UpToDate"}[updating],
 		Message: map[bool]string{true: "Deployment is updating", false: "Deployment is up-to-date"}[updating],
 	}
-}
-
-func setCrossNamespaceOwnerReferenceCondition(status *webv1.WebServerStatus, ws *webv1.WebServer, cfg webServerConfig) {
-	crossNamespace := ws.Namespace != cfg.targetNamespace
-
-	setCondition(status, metav1.Condition{
-		Type:    "OwnerReferencesValid",
-		Status:  boolToCondition(!crossNamespace),
-		Reason:  map[bool]string{true: "CrossNamespaceTarget", false: "OwnerReferencesAllowed"}[crossNamespace],
-		Message: map[bool]string{true: "Cross-namespace owned resources do not support owner references", false: "Owner references are valid for managed resources"}[crossNamespace],
-	})
 }
 
 func setCondition(status *webv1.WebServerStatus, condition metav1.Condition) {

@@ -17,7 +17,7 @@ func (r *WebServerReconciler) reconcileDeployment(
 	cfg webServerConfig,
 ) (controllerutil.OperationResult, bool, error) {
 	deploy := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{Name: ws.Name, Namespace: cfg.targetNamespace},
+		ObjectMeta: metav1.ObjectMeta{Name: ws.Name, Namespace: cfg.namespace},
 	}
 
 	var changed bool
@@ -43,7 +43,7 @@ func (r *WebServerReconciler) reconcileDeployment(
 			},
 		}
 
-		return r.setOwnerReferenceIfAllowed(ws, deploy)
+		return controllerutil.SetControllerReference(ws, deploy, r.Scheme)
 	})
 
 	return result, changed, err
@@ -75,9 +75,9 @@ func (r *WebServerReconciler) logDeploymentResult(
 	changed bool,
 ) {
 	if result == controllerutil.OperationResultCreated {
-		log.Info("Deployment created", "namespace", cfg.targetNamespace, "name", ws.Name, "replicas", cfg.replicas, "image", cfg.image)
+		log.Info("Deployment created", "namespace", cfg.namespace, "name", ws.Name, "replicas", cfg.replicas, "image", cfg.image)
 	}
 	if result == controllerutil.OperationResultUpdated && changed {
-		log.Info("Deployment updated", "namespace", cfg.targetNamespace, "name", ws.Name)
+		log.Info("Deployment updated", "namespace", cfg.namespace, "name", ws.Name)
 	}
 }
