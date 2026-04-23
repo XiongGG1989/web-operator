@@ -1,0 +1,11 @@
+apiVersion: web.xm.web/v1
+kind: WebServer
+metadata:
+  labels:
+    app.kubernetes.io/name: web-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: webserver-default
+spec:
+  image: nginx:1.30.0
+  replicas: 2
+  port: 80

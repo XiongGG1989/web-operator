@@ -1,0 +1,29 @@
+# This rule is not used by the project web-operator itself.
+# It is provided to allow the cluster admin to help manage permissions for users.
+#
+# Grants read-only access to web.xm.web resources.
+# This role is intended for users who need visibility into these resources
+# without permissions to modify them. It is ideal for monitoring purposes and limited-access viewing.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: web-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: webserver-viewer-role
+rules:
+- apiGroups:
+  - web.xm.web
+  resources:
+  - webservers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - web.xm.web
+  resources:
+  - webservers/status
+  verbs:
+  - get
