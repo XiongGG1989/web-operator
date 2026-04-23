@@ -21,7 +21,6 @@ WebServer Operator 允许用户通过 Kubernetes Custom Resource Definition (CRD
 - go version v1.24.6+
 - docker version 17.03+.
 - kubectl version v1.11.3+.
-- 访问 Kubernetes v1.11.3+ 集群的权限
 
 ### 部署到集群
 
@@ -49,7 +48,7 @@ make deploy IMG=<some-registry>/web-operator:tag
 
 > **注意**: 如果遇到 RBAC 错误，您可能需要授予自己 cluster-admin 权限或以管理员身份登录。
 
-**创建解决方案实例**
+**创建实例**
 
 您可以从 config/sample 应用示例：
 
@@ -94,7 +93,6 @@ spec:
   image: nginx:1.30.0
   port: 80
   serviceType: ClusterIP
-  # targetNamespace: other-namespace  # 可选：部署到指定 namespace
 ```
 
 ## 项目分发
