@@ -19,8 +19,8 @@ WebServer Operator 允许用户通过 Kubernetes Custom Resource Definition (CRD
 ### 前置条件
 
 - go version v1.24.6+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
+- docker version 17.03+
+- kubectl version v1.11.3+
 
 ### 部署到集群
 
