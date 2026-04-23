@@ -1,123 +1,138 @@
 # web-operator
-// TODO(user): Add simple overview of use/purpose
 
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+WebServer Operator 是一个基于 Kubernetes Operator 模式构建的控制器，用于自动化管理 Web 服务的部署和生命周期。
 
-## Getting Started
+## 项目简介
 
-### Prerequisites
+WebServer Operator 允许用户通过 Kubernetes Custom Resource Definition (CRD) 来定义和管理 Web 服务。只需创建一个 `WebServer` 资源，Operator 会自动创建对应的 Deployment 和 Service 资源，并持续监控和维护其状态。
+
+### 主要功能
+
+- **自动化部署**: 创建 WebServer CR 后自动创建 Deployment 和 Service
+- **动态更新**: 支持动态调整副本数、镜像、端口等配置
+- **状态监控**: 实时更新 WebServer 的运行状态
+- **命名空间支持**: 支持将资源部署到指定的 namespace
+- **自动清理**: 删除 WebServer CR 时自动清理关联资源
+
+## 快速开始
+
+### 前置条件
+
 - go version v1.24.6+
 - docker version 17.03+.
 - kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
+- 访问 Kubernetes v1.11.3+ 集群的权限
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+### 部署到集群
+
+**构建并推送镜像到 `IMG` 指定的位置:**
 
 ```sh
 make docker-build docker-push IMG=<some-registry>/web-operator:tag
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified.
-And it is required to have access to pull the image from the working environment.
-Make sure you have the proper permission to the registry if the above commands don’t work.
+**注意:** 镜像需要发布到您指定的私有 registry。
+确保您的工作环境有权限拉取该镜像。
+如果上述命令无法工作，请检查您对 registry 的权限。
 
-**Install the CRDs into the cluster:**
+**安装 CRD 到集群:**
 
 ```sh
 make install
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+**使用 `IMG` 指定的镜像部署 Manager 到集群:**
 
 ```sh
 make deploy IMG=<some-registry>/web-operator:tag
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
+> **注意**: 如果遇到 RBAC 错误，您可能需要授予自己 cluster-admin 权限或以管理员身份登录。
 
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+**创建解决方案实例**
+
+您可以从 config/sample 应用示例：
 
 ```sh
 kubectl apply -k config/samples/
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+>**注意**: 确保示例有默认值以便测试。
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
+### 卸载
+
+**从集群删除实例 (CRs):**
 
 ```sh
 kubectl delete -k config/samples/
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
+**从集群删除 APIs(CRDs):**
 
 ```sh
 make uninstall
 ```
 
-**UnDeploy the controller from the cluster:**
+**从集群卸载控制器:**
 
 ```sh
 make undeploy
 ```
 
-## Project Distribution
+## 使用示例
 
-Following the options to release and provide this solution to the users.
+创建一个 WebServer 资源：
 
-### By providing a bundle with all YAML files
+```yaml
+apiVersion: web.xm.web/v1
+kind: WebServer
+metadata:
+  name: my-webserver
+  namespace: default
+spec:
+  replicas: 3
+  image: nginx:1.30.0
+  port: 80
+  serviceType: ClusterIP
+  # targetNamespace: other-namespace  # 可选：部署到指定 namespace
+```
 
-1. Build the installer for the image built and published in the registry:
+## 项目分发
+
+以下是向用户发布和提供此解决方案的选项。
+
+### 提供包含所有 YAML 文件的 bundle
+
+1. 为构建并发布到 registry 的镜像构建安装程序：
 
 ```sh
 make build-installer IMG=<some-registry>/web-operator:tag
 ```
 
-**NOTE:** The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without its
-dependencies.
+**注意:** 上面提到的 makefile 目标会在 dist 目录中生成一个 'install.yaml' 文件。此文件包含使用 Kustomize 构建的所有资源，这些资源是在没有依赖项的情况下安装此项目所必需的。
 
-2. Using the installer
+2. 使用安装程序
 
-Users can just run 'kubectl apply -f <URL for YAML BUNDLE>' to install
-the project, i.e.:
+用户只需运行 'kubectl apply -f <YAML BUNDLE 的 URL>' 即可安装项目，例如：
 
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/<org>/web-operator/<tag or branch>/dist/install.yaml
 ```
 
-### By providing a Helm Chart
+### 提供 Helm Chart
 
-1. Build the chart using the optional helm plugin
+1. 使用可选的 helm 插件构建 chart
 
 ```sh
 kubebuilder edit --plugins=helm/v2-alpha
 ```
 
-2. See that a chart was generated under 'dist/chart', and users
-can obtain this solution from there.
+2. 查看在 'dist/chart' 下生成的 chart，用户可以从那里获取此解决方案。
 
-**NOTE:** If you change the project, you need to update the Helm Chart
-using the same command above to sync the latest changes. Furthermore,
-if you create webhooks, you need to use the above command with
-the '--force' flag and manually ensure that any custom configuration
-previously added to 'dist/chart/values.yaml' or 'dist/chart/manager/manager.yaml'
-is manually re-applied afterwards.
+**注意:** 如果您更改了项目，需要使用上面相同的命令更新 Helm Chart 以同步最新更改。此外，如果您创建 webhooks，需要使用上面带有 '--force' 标志的命令，并手动确保之前添加到 'dist/chart/values.yaml' 或 'dist/chart/manager/manager.yaml' 的任何自定义配置之后手动重新应用。
 
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
 
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
+## 许可证
 
 Copyright 2026 xiongming.
 
@@ -132,4 +147,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
