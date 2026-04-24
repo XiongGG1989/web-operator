@@ -25,22 +25,23 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // WebServerSpec defines the desired state of WebServer
+// +kubebuilder:validation:XValidation:rule="!(self.serviceType == 'NodePort' && has(self.port) && self.port > 32767)",message="NodePort 类型的 Service 端口不能超过 32767"
 type WebServerSpec struct {
 	// 副本数
 	// +optional
-	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:XValidation:rule="self >= 0 && self <= 10",message="副本数必须在 0 到 10 之间"
 	Replicas *int32 `json:"replicas,omitempty"`
 
-	// 镜像名称
+	// 镜像名称，必须包含镜像标签
+	// +kubebuilder:validation:XValidation:rule="size(self) > 0 && self.contains(':')",message="镜像名称不能为空且必须包含标签（格式：image:tag）"
 	Image string `json:"image,omitempty"`
 
 	// 端口号
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
+	// +kubebuilder:validation:XValidation:rule="self >= 1 && self <= 65535",message="端口号必须在 1 到 65535 之间"
 	Port int32 `json:"port,omitempty"`
 
 	// Service 类型
-	// +kubebuilder:validation:Enum=ClusterIP;NodePort;LoadBalancer
+	// +kubebuilder:validation:XValidation:rule="self in ['ClusterIP', 'NodePort', 'LoadBalancer', '']",message="Service 类型必须是 ClusterIP、NodePort 或 LoadBalancer"
 	// +optional
 	ServiceType string `json:"serviceType,omitempty"`
 

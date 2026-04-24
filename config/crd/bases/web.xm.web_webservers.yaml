@@ -40,19 +40,25 @@ spec:
             description: spec defines the desired state of WebServer
             properties:
               image:
-                description: 镜像名称
+                description: 镜像名称，必须包含镜像标签
                 type: string
+                x-kubernetes-validations:
+                - message: 镜像名称不能为空且必须包含标签（格式：image:tag）
+                  rule: size(self) > 0 && self.contains(':')
               port:
                 description: 端口号
                 format: int32
-                maximum: 65535
-                minimum: 1
                 type: integer
+                x-kubernetes-validations:
+                - message: 端口号必须在 1 到 65535 之间
+                  rule: self >= 1 && self <= 65535
               replicas:
                 description: 副本数
                 format: int32
-                minimum: 0
                 type: integer
+                x-kubernetes-validations:
+                - message: 副本数必须在 0 到 10 之间
+                  rule: self >= 0 && self <= 10
               resources:
                 description: 资源限制
                 properties:
@@ -114,12 +120,15 @@ spec:
                 type: object
               serviceType:
                 description: Service 类型
-                enum:
-                - ClusterIP
-                - NodePort
-                - LoadBalancer
                 type: string
+                x-kubernetes-validations:
+                - message: Service 类型必须是 ClusterIP、NodePort 或 LoadBalancer
+                  rule: self in ['ClusterIP', 'NodePort', 'LoadBalancer', '']
             type: object
+            x-kubernetes-validations:
+            - message: NodePort 类型的 Service 端口不能超过 32767
+              rule: '!(self.serviceType == ''NodePort'' && has(self.port) && self.port
+                > 32767)'
           status:
             description: status defines the observed state of WebServer
             properties:

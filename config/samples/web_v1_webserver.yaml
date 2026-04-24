@@ -5,7 +5,8 @@ metadata:
     app.kubernetes.io/name: web-operator
     app.kubernetes.io/managed-by: kustomize
   name: webserver-default
+  namespace: default
 spec:
   image: nginx:1.30.0
-  replicas: 2
+  replicas: 1
   port: 80
