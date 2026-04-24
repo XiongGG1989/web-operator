@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	webv1 "github.com/XiongGG1989/web-operator/api/v1"
-	"github.com/XiongGG1989/web-operator/internal/controller"
+	"github.com/XiongGG1989/web-operator/controller"
 	// +kubebuilder:scaffold:imports
 )
 
