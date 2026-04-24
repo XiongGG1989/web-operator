@@ -75,7 +75,9 @@ func (r *WebServerReconciler) logDeploymentResult(
 	changed bool,
 ) {
 	if result == controllerutil.OperationResultCreated {
-		log.Info("Deployment created", "namespace", cfg.namespace, "name", ws.Name, "replicas", cfg.replicas, "image", cfg.image)
+		log.Info("Deployment created",
+			"namespace", cfg.namespace, "name", ws.Name,
+			"replicas", cfg.replicas, "image", cfg.image)
 	}
 	if result == controllerutil.OperationResultUpdated && changed {
 		log.Info("Deployment updated", "namespace", cfg.namespace, "name", ws.Name)
