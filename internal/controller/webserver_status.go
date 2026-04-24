@@ -14,7 +14,7 @@ import (
 func (r *WebServerReconciler) reconcileStatus(
 	ctx context.Context,
 	log interface {
-		Info(string, ...interface{})
+		Info(string, ...any)
 	},
 	ws *webv1.WebServer,
 	cfg webServerConfig,

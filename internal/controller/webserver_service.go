@@ -53,7 +53,7 @@ func serviceSpecChanged(svc *corev1.Service, cfg webServerConfig) bool {
 
 func (r *WebServerReconciler) logServiceResult(
 	log interface {
-		Info(string, ...interface{})
+		Info(string, ...any)
 	},
 	ws *webv1.WebServer,
 	cfg webServerConfig,

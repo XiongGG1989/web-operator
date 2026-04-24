@@ -67,7 +67,7 @@ func deploymentSpecChanged(deploy *appsv1.Deployment, cfg webServerConfig) bool 
 
 func (r *WebServerReconciler) logDeploymentResult(
 	log interface {
-		Info(string, ...interface{})
+		Info(string, ...any)
 	},
 	ws *webv1.WebServer,
 	cfg webServerConfig,
